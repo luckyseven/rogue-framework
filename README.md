@@ -19,7 +19,7 @@ app.listen(config.main.port, () => {
 ## Installation
 There are two ways to use Rogue.
 #### Using the CLI (recommended)
-The first step is to install the [rogue-framework-cli](https://www.npmjs.com/package/rogue-framework-cli) globally in your system with `npm install`:
+The first step is to install the [rogue-framework-cli](https://github.com/luckyseven/rogue-framework-cli) globally in your system with `npm install`:
 ```bash
 $ npm install -g rogue-framework-cli
 ```

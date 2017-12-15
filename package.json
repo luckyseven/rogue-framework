@@ -1,8 +1,9 @@
 {
   "name": "rogue-framework",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Rogue Framework - Power up your NodeJS applications with a reliable structure and shared services",
   "main": "index.js",
+  "repository": "luckyseven/rogue-framework",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
