@@ -3,7 +3,7 @@
 Fast and reliable web development with [node](http://nodejs.org).
 
 ## Why Rogue?
-Rogue is a module-based framework for Node that offers the fastest way to develop professional web applications. Based on [Express](http://expressjs.com/) and [Mongoose](http://mongoosejs.com/), has also a lot of other integrations. Thanks to [rogue-framework-cli](https://www.npmjs.com/package/rogue-framework-cli) you can start to develop your applications in zero-time, focusing your energy only on business logic on the powerful structure of Rogue.
+Rogue is a module-based framework for Node that offers the fastest way to develop professional web applications. Based on [Express](http://expressjs.com/) and [Mongoose](http://mongoosejs.com/), has also a lot of other integrations. Thanks to [rogue-framework-cli](https://github.com/luckyseven/rogue-framework-cli) you can start to develop your applications in zero-time, focusing your energy only on business logic on the powerful structure of Rogue.
 
 ```js
 const config = require('./config/config.js');
