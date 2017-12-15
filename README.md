@@ -117,6 +117,19 @@ app.listen(config.main.port, () => {
     console.log(`Rogue Framework is listening on port ${config.main.port}`)
 });
 ```
+
+## Modules docs
+### Mongoose
+Files in `/schemas` directory should be based on this template:
+```js
+module.exports = (rogue) => {
+    return new rogue.mongoose.Schema({
+        parameter: String,
+        //...
+    });
+};
+```
+
 ## Philosophy
 Rogue was born to provide the fastest way to build a modern web application with a reliable (and reusable) structure. The developer should only focus on the business logic, leaving everything related to the structure to Rogue. Speed up your work!
 
