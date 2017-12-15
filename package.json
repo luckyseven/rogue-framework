@@ -1,13 +1,13 @@
 {
   "name": "rogue-framework",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Rogue Framework - Power up your NodeJS applications with a reliable structure and shared services",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Alberto Fecchi <alberto.fecchi@gmail.com> (https://www.luckyseven.it)",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "body-parser": "^1.18.2",
     "chalk": "^2.3.0",
