@@ -18,7 +18,7 @@ app.listen(config.main.port, () => {
 
 ## Installation
 There are two ways to use Rogue.
-#### Using the CLI (recommended)
+### Using the CLI (recommended)
 The first step is to install the [rogue-framework-cli](https://github.com/luckyseven/rogue-framework-cli) globally in your system with `npm install`:
 ```bash
 $ npm install -g rogue-framework-cli
@@ -37,7 +37,7 @@ Use `rogue init` to create a brand new Rogue project:
 $ rogue init
 ```
 Now you can start your web application with `node index.js`. Visit [http://localhost:4000/api/v1/hello](http://localhost:4000/api/v1/hello) and check if it works.
-#### Install as module
+### Install as module
 You can also install Rogue without the CLI helper:
 ```bash
 $ npm install rogue-framework
