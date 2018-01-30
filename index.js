@@ -9,6 +9,27 @@ module.exports = class Rogue {
         this.express    = express;
         this.expressApp = express();
 
+        // todo: should be moved
+        if (this.config.bodyParser.type !== '') {
+            switch (this.config.bodyParser.type) {
+                case 'json':
+                    this.expressApp.use(bodyParser.json(this.config.bodyParser.options));
+                    break;
+                case 'raw':
+                    this.expressApp.use(bodyParser.raw(this.config.bodyParser.options));
+                    break;
+                case 'text':
+                    this.expressApp.use(bodyParser.text(this.config.bodyParser.options));
+                    break;
+                case 'url':
+                    this.expressApp.use(bodyParser.urlencoded(this.config.bodyParser.options));
+                    break;
+            }
+        } else {
+            this.expressApp.use(bodyParser.json());
+        }
+
+        this.loadUtils();
         this.loadControllers();
         this.loadModules();
         this.loadRoutes();
@@ -47,8 +68,25 @@ module.exports = class Rogue {
         }
     }
 
+    loadUtils() {
+        const utilsPath = path.join(this.getRootDir(), '/utils');
+        if (!fs.existsSync(utilsPath))
+            throw new Error("Directory 'utils' doesn't exists in the project root.");
+        this.utils = requireAll({
+            dirname : utilsPath,
+            resolve : util => util(this)
+        });
+    }
+
     action(controller, action) {
         return this.controllers[controller][action];
+    }
+
+    asyncAction(controller, action) {
+        return (req, res, next) => {
+            Promise.resolve(this.action(controller, action)(req, res, next))
+                .catch(next);
+        };
     }
 
     getRootDir() {
