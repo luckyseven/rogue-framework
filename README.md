@@ -58,7 +58,7 @@ Everything in Rogue will be globally available in the applications. Use the powe
 ## Module system
 Rogue has it's own module system. In the initial structure you will find:
 * `mongoose`: the Mongoose module.
-* `logger`: a logger module based on [multer](https://www.npmjs.com/package/multer).
+* `logger`: a logger module based on [morgan](https://www.npmjs.com/package/morgan).
 * _More modules are coming soon... this is an alpha version_ ;-)
 
 You can create custom modules in the `/modules` directory of your project using this structure:
