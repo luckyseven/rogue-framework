@@ -2,6 +2,7 @@ const express           = require('express');
 const fs                = require('fs');
 const path              = require('path');
 const requireAll        = require('require-all');
+const bodyParser        = require('body-parser');
 
 module.exports = class Rogue {
     constructor(config) {
