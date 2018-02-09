@@ -48,11 +48,13 @@ module.exports = class Rogue {
 
     loadModules() {
         for (let module in this.config.modules) {
-            let modulePath = '/modules/' + module + '.js';
-            if (fs.existsSync(path.join(__dirname, modulePath))) {
-                require(path.join(__dirname, modulePath))(this, this.config.modules[module]);
-            } else if (fs.existsSync(path.join(this.getRootDir(), modulePath))) {
-                require(path.join(this.getRootDir(), modulePath))(this, this.config.modules[module]);
+            if (module.enabled) {
+                let modulePath = '/modules/' + module + '.js';
+                if (fs.existsSync(path.join(__dirname, modulePath))) {
+                    require(path.join(__dirname, modulePath))(this, this.config.modules[module]);
+                } else if (fs.existsSync(path.join(this.getRootDir(), modulePath))) {
+                    require(path.join(this.getRootDir(), modulePath))(this, this.config.modules[module]);
+                }
             }
         }
     }
