@@ -48,7 +48,7 @@ module.exports = class Rogue {
 
     loadModules() {
         for (let module in this.config.modules) {
-            if (module.enabled) {
+            if (this.config.modules[module].enabled) {
                 let modulePath = '/modules/' + module + '.js';
                 if (fs.existsSync(path.join(__dirname, modulePath))) {
                     require(path.join(__dirname, modulePath))(this, this.config.modules[module]);
