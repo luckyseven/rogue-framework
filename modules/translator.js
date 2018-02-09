@@ -10,11 +10,18 @@ module.exports = (rogue, config) => {
         fs.readdirSync(messagesPath).forEach(message => {
             messages[message.replace('.yaml', '')] = yaml.safeLoad(fs.readFileSync(path.join(messagesPath, message), 'utf8'));
         });
+        rogue.translator_language = config.default_language ? config.default_language : 'en';
         rogue.messages = messages;
-        rogue.trans = (language, message) => {
-            let result = rogue.messages[language];
+        rogue.trans = (message, path, language) => {
+            let result;
+
+            if (language === undefined) {
+                language = rogue.translator_language;
+            }
+
             try {
-                let parts = message.split('.');
+                result = rogue.messages[message][language];
+                let parts = path.split('.');
                 parts.forEach(key => {
                     result = result[key];
                 });
