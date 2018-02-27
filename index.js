@@ -31,8 +31,8 @@ module.exports = class Rogue {
         }
 
         this.loadUtils();
-        this.loadControllers();
         this.loadModules();
+        this.loadControllers();
         this.loadRoutes();
     }
 
