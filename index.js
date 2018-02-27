@@ -3,6 +3,7 @@ const fs                = require('fs');
 const path              = require('path');
 const requireAll        = require('require-all');
 const bodyParser        = require('body-parser');
+const shell             = require('shelljs');
 
 module.exports = class Rogue {
     constructor(config) {
@@ -11,13 +12,8 @@ module.exports = class Rogue {
         this.expressApp = express();
 
         // todo: should be moved
-        if (Array.isArray(this.config.folders)) {
-            this.config.folders.forEach((folder) => {
-                const current = path.join(this.getRootDir(), folder);
-                if (!fs.existsSync(current)) {
-                    fs.mkdirSync(current);
-                }
-            });
+        if (Array.isArray(this.config.folders) && this.config.folders.length) {
+            shell.mkdir('-p', path.join(this.getRootDir(), folder));
         }
 
         // todo: should be moved

@@ -1,6 +1,6 @@
 {
   "name": "rogue-framework",
-  "version": "1.0.14",
+  "version": "1.0.15",
   "description": "Rogue Framework - Power up your NodeJS applications with a reliable structure and shared services",
   "main": "index.js",
   "repository": "luckyseven/rogue-framework",
@@ -19,6 +19,7 @@
     "mongoose": "^4.13.6",
     "morgan": "^1.9.0",
     "require-all": "^2.2.0",
-    "rotating-file-stream": "^1.3.4"
+    "rotating-file-stream": "^1.3.4",
+    "shelljs": "^0.8.1"
   }
 }
