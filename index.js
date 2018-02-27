@@ -11,6 +11,16 @@ module.exports = class Rogue {
         this.expressApp = express();
 
         // todo: should be moved
+        if (Array.isArray(this.config.folders)) {
+            this.config.folders.forEach((folder) => {
+                const current = path.join(this.getRootDir(), folder);
+                if (!fs.existsSync(current)) {
+                    fs.mkdirSync(current);
+                }
+            });
+        }
+
+        // todo: should be moved
         if (this.config.bodyParser.type !== '') {
             switch (this.config.bodyParser.type) {
                 case 'json':
@@ -31,8 +41,8 @@ module.exports = class Rogue {
         }
 
         this.loadUtils();
-        this.loadControllers();
         this.loadModules();
+        this.loadControllers();
         this.loadRoutes();
     }
 
