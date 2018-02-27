@@ -3,12 +3,15 @@ const fs                = require('fs');
 const path              = require('path');
 const requireAll        = require('require-all');
 const bodyParser        = require('body-parser');
+const shell             = require('shelljs');
 
 module.exports = class Rogue {
     constructor(config) {
         this.config     = config;
         this.express    = express;
         this.expressApp = express();
+
+        if (Array.isArray(this.config.folders) && this.config.folders.length) shell.mkdir('-p', config.folders);
 
         // todo: should be moved
         if (this.config.bodyParser.type !== '') {
@@ -31,8 +34,8 @@ module.exports = class Rogue {
         }
 
         this.loadUtils();
-        this.loadControllers();
         this.loadModules();
+        this.loadControllers();
         this.loadRoutes();
     }
 
