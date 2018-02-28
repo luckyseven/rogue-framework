@@ -13,7 +13,8 @@ module.exports = class Rogue {
 
         // todo: should be moved
         if (Array.isArray(this.config.folders) && this.config.folders.length) {
-            shell.mkdir('-p', path.join(this.getRootDir(), folder));
+            let folders = this.config.folders.map(folder => path.join(this.getRootDir(), folder));
+            shell.mkdir('-p', folders);
         }
 
         // todo: should be moved
