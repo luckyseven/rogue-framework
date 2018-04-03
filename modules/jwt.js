@@ -15,7 +15,7 @@ module.exports = (rogue, config) => {
 
     rogue.jwt = {
         generate: (payload, profile) => {
-            const profile = getProfile(profile);
+            let profile = getProfile(profile);
 
             //TODO: check if profile is a valid object
 
@@ -25,7 +25,7 @@ module.exports = (rogue, config) => {
             );
         },
         verify: (token, profile) => {
-            const profile = getProfile(profile);
+            let profile = getProfile(profile);
 
             try {
                 return jwt.verify(token, profile.secret);
