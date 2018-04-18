@@ -1,7 +1,5 @@
 const jwt = require('jsonwebtoken');
 
-
-
 module.exports = (rogue, config) => {
     if (!config.enabled)
         return;
@@ -11,6 +9,17 @@ module.exports = (rogue, config) => {
             return config.profiles.default;
 
         return config.profiles['profile'];
+    }
+
+    function getTokenFromAuthHeader(authorization) {
+        try {
+            if (authorization.indexOf(' ') > -1) {
+                return authorization.split(' ')[1];
+            }
+            return authorization;
+        } catch (err) {
+            return '';
+        }
     }
 
     rogue.jwt = {
@@ -36,13 +45,14 @@ module.exports = (rogue, config) => {
 
         middlewares: {
             JWTAuth: (profile) => {
-                const profile = getProfile(profile);
                 return function(req, res, next) {
                     // TODO: use Auth Bearer + improve error messages
-                    if (this.verify(req.headers.jwt_token, profile)) {
+                    let token = getTokenFromAuthHeader(req.headers.authorization);
+                    if (rogue.jwt.verify(token, profile)) {
+                        req.jwt_token = token;
                         next();
                     } else {
-                        res.status(500).json({error: "Invalid token"});
+                        res.status(401).json({error: "Invalid token"});
                     }
                 }
             }
