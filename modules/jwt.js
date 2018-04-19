@@ -8,7 +8,7 @@ module.exports = (rogue, config) => {
         if (!profile)
             return config.profiles.default;
 
-        return config.profiles['profile'];
+        return config.profiles[profile];
     }
 
     function getTokenFromAuthHeader(authorization) {
