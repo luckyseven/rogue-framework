@@ -102,11 +102,11 @@ module.exports = class Rogue {
                 }
                 response.complete(res);
             };
-            res.error = (response, status) => {
-                if (!(response instanceof RogueError)) {
-                    response = new RogueError(response, status);
+            res.error = (error, status) => {
+                if (!(error instanceof RogueError)) {
+                    error = new RogueError(error, status);
                 }
-                response.complete(res);
+                error.complete(res);
             };
             this.controllers[controller][action](req, res, next);
         }
