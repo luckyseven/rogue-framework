@@ -1,6 +1,6 @@
 {
   "name": "rogue-framework",
-  "version": "1.0.30",
+  "version": "1.0.31",
   "description": "Rogue Framework - Power up your NodeJS applications with a reliable structure and shared services",
   "main": "index.js",
   "repository": "luckyseven/rogue-framework",

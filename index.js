@@ -4,6 +4,8 @@ const path              = require('path');
 const requireAll        = require('require-all');
 const bodyParser        = require('body-parser');
 const shell             = require('shelljs');
+const RogueResponse     = require('./core/http/RogueResponse');
+const RogueError        = require('./core/http/RogueError');
 
 module.exports = class Rogue {
     constructor(config) {
@@ -41,6 +43,8 @@ module.exports = class Rogue {
         this.loadModules();
         this.loadControllers();
         this.loadRoutes();
+
+        this.loadHTTPStuff();
     }
 
     loadControllers() {
@@ -88,8 +92,30 @@ module.exports = class Rogue {
         });
     }
 
+    // action(controller, action) {
+    //     return this.controllers[controller][action];
+    // }
+
+    loadHTTPStuff() {
+        this.response = ()
+    }
+
     action(controller, action) {
-        return this.controllers[controller][action];
+        return (req, res, next) => {
+            res.complete = (response, status) => {
+                if (!(response instanceof RogueResponse)) {
+                    response = new RogueResponse(response, status);
+                }
+                response.complete(res);
+            };
+            res.error = (response, status) => {
+                if (!(response instanceof RogueError)) {
+                    response = new RogueError(response, status);
+                }
+                response.complete(res);
+            };
+            this.controllers[controller][action](req, res, next);
+        }
     }
 
     asyncAction(controller, action) {
