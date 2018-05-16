@@ -44,12 +44,12 @@ module.exports = (rogue, config) => {
         },
 
         middlewares: {
-            JWTAuth: (profile) => {
+            JWTAuth: (profile, role) => {
                 return function(req, res, next) {
                     // TODO: use Auth Bearer + improve error messages
                     let token   = getTokenFromAuthHeader(req.headers.authorization);
                     let payload = rogue.jwt.verify(token, profile);
-                    if (payload) {
+                    if (payload && (!role || role === payload.role)) {
                         req.jwt_token   = token;
                         req.jwt_payload = payload;
                         next();
