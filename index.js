@@ -43,8 +43,6 @@ module.exports = class Rogue {
         this.loadModules();
         this.loadControllers();
         this.loadRoutes();
-
-        this.loadHTTPStuff();
     }
 
     loadControllers() {
@@ -95,10 +93,6 @@ module.exports = class Rogue {
     // action(controller, action) {
     //     return this.controllers[controller][action];
     // }
-
-    loadHTTPStuff() {
-        this.response = ()
-    }
 
     action(controller, action) {
         return (req, res, next) => {
