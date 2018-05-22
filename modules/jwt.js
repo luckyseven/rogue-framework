@@ -22,6 +22,7 @@ module.exports = (rogue, config) => {
         }
     }
 
+    //TODO: valutare generazione certificati invece di secret
     rogue.jwt = {
         generate: (payload, profile) => {
             profile = getProfile(profile);
