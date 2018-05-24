@@ -76,7 +76,12 @@ module.exports = class Rogue {
             dirname     :  routesPath
         });
         for (let route in this.config.routes) {
-            this.expressApp.use(route, routes[this.config.routes[route]](this));
+            if (!Array.isArray(this.config.routes[route])) {
+                this.config.routes[route] = [this.config.routes[route]];
+            }
+            this.config.routes[route].forEach((router) => {
+                this.expressApp.use(route, routes[router](this));
+            });
         }
     }
 
