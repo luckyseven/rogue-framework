@@ -61,10 +61,13 @@ module.exports = (rogue, config) => {
             },
             JWTRole: (role, profile) => {
                 return function(req, res, next) {
+                    if (role && !Array.isArray(role)) {
+                        role = [role];
+                    }
                     // TODO: use Auth Bearer + improve error messages
                     let token   = getTokenFromAuthHeader(req.headers.authorization);
                     let payload = rogue.jwt.verify(token, profile);
-                    if (payload && (!role || role === payload.role)) {
+                    if (payload && (!role || role.includes(payload.role))) {
                         req.jwt_token   = token;
                         req.jwt_payload = payload;
                         next();
