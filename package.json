@@ -1,6 +1,6 @@
 {
   "name": "rogue-framework",
-  "version": "1.0.35",
+  "version": "1.0.36",
   "description": "Rogue Framework - Power up your NodeJS applications with a reliable structure and shared services",
   "main": "index.js",
   "repository": "luckyseven/rogue-framework",
@@ -10,6 +10,7 @@
   "author": "Alberto Fecchi <alberto.fecchi@gmail.com> (https://www.luckyseven.it)",
   "license": "MIT",
   "dependencies": {
+    "bcrypt": "^2.0.1",
     "body-parser": "^1.18.2",
     "chalk": "^2.3.0",
     "clear": "0.0.1",
