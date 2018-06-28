@@ -113,7 +113,7 @@ module.exports = class Rogue {
                 }
                 error.complete(res);
             };
-            this.controllers[controller][action](req, res, next);
+            return this.controllers[controller][action](req, res, next);
         }
     }
 
