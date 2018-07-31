@@ -99,7 +99,7 @@ module.exports = class Rogue {
     //     return this.controllers[controller][action];
     // }
 
-    action(controller, action) {
+    action(controller, action, data) {
         return (req, res, next) => {
             res.complete = (response, status) => {
                 if (!(response instanceof RogueResponse)) {
@@ -113,13 +113,16 @@ module.exports = class Rogue {
                 }
                 error.complete(res);
             };
+
+            req._data = typeof data !== "undefined" ? data : null;
+
             return this.controllers[controller][action](req, res, next);
         }
     }
 
-    asyncAction(controller, action) {
+    asyncAction(controller, action, data) {
         return (req, res, next) => {
-            Promise.resolve(this.action(controller, action)(req, res, next))
+            Promise.resolve(this.action(controller, action, data)(req, res, next))
                 .catch(next);
         };
     }
