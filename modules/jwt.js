@@ -29,8 +29,10 @@ module.exports = (rogue, config) => {
 
             //TODO: check if profile is a valid object
 
+            const date = Math.floor(Date.now() / 1000);
+
             return jwt.sign(
-                Object.assign({ exp: profile.expiration }, payload),
+                Object.assign({ exp: date + profile.expiration }, payload),
                 profile.secret
             );
         },
