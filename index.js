@@ -9,9 +9,14 @@ const RogueError        = require('./core/http/RogueError');
 
 module.exports = class Rogue {
     constructor(config) {
-        this.config     = config;
         this.express    = express;
         this.expressApp = express();
+
+        if (!config) {
+            this.loadConfFromEnv();
+        } else {
+            this.config = config;
+        }
 
         // todo: should be moved
         if (Array.isArray(this.config.folders) && this.config.folders.length) {
@@ -43,6 +48,28 @@ module.exports = class Rogue {
         this.loadModules();
         this.loadControllers();
         this.loadRoutes();
+    }
+
+    loadConfFromEnv() {
+        this.config = require(this.getRootDir() + '/config/config.js');
+
+        if (typeof process.env.NODE_ENV !== 'undefined') {
+            const env = require(this.getRootDir() + '/config/config.' + process.env.NODE_ENV + '.js');
+
+            const recursiveFunc = (conf, env) => {
+                for (let key of Object.keys(env)) {
+
+                    if (typeof conf[key] === 'undefined' || typeof conf[key] !== 'object') {
+                        conf[key] = env[key];
+                        continue;
+                    }
+
+                    recursiveFunc(conf[key], env[key]);
+                }
+            };
+
+            recursiveFunc(this.config, env);
+        }
     }
 
     loadControllers() {
