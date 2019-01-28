@@ -4,9 +4,9 @@ const path              = require('path');
 const requireAll        = require('require-all');
 const bodyParser        = require('body-parser');
 const shell             = require('shelljs');
+const glob              = require('glob');
 const RogueResponse     = require('./core/http/RogueResponse');
 const RogueError        = require('./core/http/RogueError');
-
 module.exports = class Rogue {
     constructor(config) {
         this.express    = express;
@@ -54,26 +54,33 @@ module.exports = class Rogue {
         this.config = require(this.getRootDir() + '/config/config.js');
 
         if (typeof process.env.NODE_ENV !== 'undefined') {
-            const env = require(this.getRootDir() + '/config/config.' + process.env.NODE_ENV + '.js');
+            try {
+                const env = require(this.getRootDir() + '/config/config.' + process.env.NODE_ENV + '.js');
 
-            const recursiveFunc = (conf, env) => {
-                for (let key of Object.keys(env)) {
+                const importValues = (conf, env) => {
+                    for (let key of Object.keys(env)) {
 
-                    if (typeof conf[key] === 'undefined' || typeof conf[key] !== 'object') {
-                        conf[key] = env[key];
-                        continue;
+                        if (typeof conf[key] === 'undefined' || typeof conf[key] !== 'object') {
+                            conf[key] = env[key];
+                            continue;
+                        }
+
+                        importValues(conf[key], env[key]);
                     }
+                };
 
-                    recursiveFunc(conf[key], env[key]);
-                }
-            };
-
-            recursiveFunc(this.config, env);
+                importValues(this.config, env);
+            } catch (err) {}
         }
     }
 
     loadControllers() {
         const controllersPath = path.join(this.getRootDir(), '/controllers');
+
+        glob.sync( controllersPath + '/**/*.js' ).forEach( function( file ) {
+            require( path.resolve( file ) );
+        });
+
         if (!fs.existsSync(controllersPath))
             throw new Error("Directory 'controllers' doesn't exists in the project root.");
         this.controllers = requireAll({
