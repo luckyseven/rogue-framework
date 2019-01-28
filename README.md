@@ -3,7 +3,7 @@
 Fast and reliable web development with [node](http://nodejs.org).
 
 ## Why Rogue?
-Rogue is a module-based framework for Node that offers the fastest way to develop professional web applications. Based on [Express](http://expressjs.com/) and [Mongoose](http://mongoosejs.com/), has also a lot of other integrations. Thanks to [rogue-framework-cli](https://www.npmjs.com/package/rogue-framework-cli) you can start to develop your applications in zero-time, focusing your energy only on business logic on the powerful structure of Rogue.
+Rogue is a module-based framework for Node that offers the fastest way to develop professional web applications. Based on [Express](http://expressjs.com/) and [Mongoose](http://mongoosejs.com/), has also a lot of other integrations. Thanks to [rogue-framework-cli](https://github.com/luckyseven/rogue-framework-cli) you can start to develop your applications in zero-time, focusing your energy only on business logic on the powerful structure of Rogue.
 
 ```js
 const config = require('./config/config.js');
@@ -18,7 +18,7 @@ app.listen(config.main.port, () => {
 
 ## Installation
 There are two ways to use Rogue.
-#### Using the CLI (recommended)
+### Using the CLI (recommended)
 The first step is to install the [rogue-framework-cli](https://github.com/luckyseven/rogue-framework-cli) globally in your system with `npm install`:
 ```bash
 $ npm install -g rogue-framework-cli
@@ -37,7 +37,7 @@ Use `rogue init` to create a brand new Rogue project:
 $ rogue init
 ```
 Now you can start your web application with `node index.js`. Visit [http://localhost:4000/api/v1/hello](http://localhost:4000/api/v1/hello) and check if it works.
-#### Install as module
+### Install as module
 You can also install Rogue without the CLI helper:
 ```bash
 $ npm install rogue-framework
@@ -58,8 +58,9 @@ Everything in Rogue will be globally available in the applications. Use the powe
 ## Module system
 Rogue has it's own module system. In the initial structure you will find:
 * `mongoose`: the Mongoose module.
-* `logger`: a logger module based on [multer](https://www.npmjs.com/package/multer).
+* `logger`: a logger module based on [morgan](https://www.npmjs.com/package/morgan).
 * _More modules are coming soon... this is an alpha version_ ;-)
+
 You can create custom modules in the `/modules` directory of your project using this structure:
 ```js
 module.exports = (rogue, config) => {
@@ -116,6 +117,19 @@ app.listen(config.main.port, () => {
     console.log(`Rogue Framework is listening on port ${config.main.port}`)
 });
 ```
+
+## Modules docs
+### Mongoose
+Files in `/schemas` directory should be based on this template:
+```js
+module.exports = (rogue) => {
+    return new rogue.mongoose.Schema({
+        parameter: String,
+        //...
+    });
+};
+```
+
 ## Philosophy
 Rogue was born to provide the fastest way to build a modern web application with a reliable (and reusable) structure. The developer should only focus on the business logic, leaving everything related to the structure to Rogue. Speed up your work!
 
