@@ -30,8 +30,6 @@ const storage = (data) => multer.diskStorage({
 
 module.exports = async (rogue, config) => {
     if (config.enabled) {
-        const response = (body, status, res) => new RogueResponse(body, status).complete(res);
-
         const loopReq = (req, data) => {
             for (let d of data) {
                 if (typeof req[d] === 'undefined')
@@ -93,7 +91,8 @@ module.exports = async (rogue, config) => {
         const required = data =>
             (req, res, next) => {
                 const missingField = loopReq(req[data.obj], data.fields);
-                return !missingField ? next() : response({error: `field '${missingField}' is mandatory`}, 422, res);
+
+                return !missingField ? next() : new RogueResponse({error: `field '${missingField}' is mandatory`}, 422).complete(res)
             };
         const allowed = data =>
             (req, res, next) => {
@@ -130,7 +129,7 @@ module.exports = async (rogue, config) => {
                     return next();
                 }
                 catch (e) {
-                    return response({error: e.toString()}, 400, res);
+                    return new RogueResponse({error: e.toString()}, 400).complete(res);
                 }
             };
         const custom = data =>
@@ -148,7 +147,7 @@ module.exports = async (rogue, config) => {
                     return next();
                 }
                 catch (e) {
-                    return response({error: e.toString()}, 400, res);
+                    return new RogueResponse({error: e.toString()}, 400).complete(res);
                 }
             };
         const uploadFile = data =>
@@ -160,7 +159,7 @@ module.exports = async (rogue, config) => {
                 try {
                     data.forEach(d => createFolder(d.folder));
                 } catch (e) {
-                    return response({error: e}, 500, res)
+                    return new RogueResponse({error: e}, 500).complete(res);
                 }
 
                 let upload = multer({
@@ -172,7 +171,7 @@ module.exports = async (rogue, config) => {
 
                 upload(req, res, function (err) {
                     if (err) // err instanceof multer.MulterError
-                        return response({error: err}, 500, res);
+                        return new RogueResponse({error: e}, 500).complete(res);
 
                     return next();
                 });
