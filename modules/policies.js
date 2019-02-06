@@ -145,7 +145,7 @@ module.exports = async (rogue, config) => {
                     return next();
                 }
                 catch (e) {
-                    return res.error({error: e.toString()}, 400);
+                    return res.error({error: e.toString()}, data.status);
                 }
             };
         const uploadFile = data =>
@@ -176,11 +176,11 @@ module.exports = async (rogue, config) => {
             };
 
         rogue.middlewares = {
-            required   : (obj, fields)       => required({obj, fields}),
-            allowed    : (obj, fields)       => allowed({obj, fields}),
-            castFields : (obj, fields, cast) => castFields({obj, fields, cast}),
-            custom     : (obj, fields, func) => custom({obj, fields, func}),
-            uploadFile : (obj)               => uploadFile(obj),
+            required   : (obj, fields)                     => required({obj, fields}),
+            allowed    : (obj, fields)                     => allowed({obj, fields}),
+            castFields : (obj, fields, cast)               => castFields({obj, fields, cast}),
+            custom     : (obj, fields, func, status = 500) => custom({obj, fields, func, status}),
+            uploadFile : (obj)                             => uploadFile(obj),
         };
 
         rogue.policies = requireAll({
