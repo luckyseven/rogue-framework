@@ -129,8 +129,38 @@ module.exports = class Rogue {
         });
     }
 
-    action(controller, action, data) {
+    policy(controller, action, data) {
         return (req, res, next) => {
+
+            if (!this.config.modules.policies.enabled)
+                return;
+
+            if (typeof this.policies[controller] === 'undefined')
+                return;
+
+            if (typeof this.policies[controller][action] === 'undefined')
+                return;
+
+            for (let policy of this.policies[controller][action]) {
+                this.express.Router({mergeParams: true}).use(policy)(req, res, next);
+
+                if (res.headersSent)
+                    return;
+            }
+
+            return;
+        }
+    }
+
+    action(controller, action, data) {
+
+        return (req, res, next) => {
+
+            this.policy(controller, action, data)(req, res, next);
+
+            if (res.headersSent)
+                return;
+
             res.complete = (response, status) => {
                 if (!(response instanceof RogueResponse)) {
                     response = new RogueResponse(response, status);
@@ -146,13 +176,8 @@ module.exports = class Rogue {
 
             req.data = typeof data !== "undefined" ? data : null;
 
-            if (
-                this.config.modules.policies.enabled
-                && typeof this.policies[controller] !== 'undefined'
-                && typeof this.policies[controller][action] !== 'undefined'
-            ) {
-                this.policies[controller][action].forEach(policy => policy(req, res, next));
-            }
+            console.log(controller, action);
+            console.log(res.headersSent);
 
             return this.controllers[controller][action](req, res, next);
         }
