@@ -3,8 +3,6 @@ const path = require('path');
 const multer = require('multer');
 const requireAll = require('require-all');
 
-const RogueResponse = require("../core/http/RogueResponse");
-
 const storage = (data) => multer.diskStorage({
     destination: function(req, file, callback) {
         callback(null, data.find(d => d.name === file.fieldname).folder);
@@ -92,7 +90,7 @@ module.exports = async (rogue, config) => {
             (req, res, next) => {
                 const missingField = loopReq(req[data.obj], data.fields);
 
-                return !missingField ? next() : new RogueResponse({error: `field '${missingField}' is mandatory`}, 422).complete(res)
+                return !missingField ? next() : res.error({error: `field '${missingField}' is mandatory`}, 422)
             };
         const allowed = data =>
             (req, res, next) => {
@@ -129,7 +127,7 @@ module.exports = async (rogue, config) => {
                     return next();
                 }
                 catch (e) {
-                    return new RogueResponse({error: e.toString()}, 400).complete(res);
+                    return res.error({error: e.toString()}, 400);
                 }
             };
         const custom = data =>
@@ -147,7 +145,7 @@ module.exports = async (rogue, config) => {
                     return next();
                 }
                 catch (e) {
-                    return new RogueResponse({error: e.toString()}, 400).complete(res);
+                    return res.error({error: e.toString()}, 400);
                 }
             };
         const uploadFile = data =>
@@ -159,7 +157,7 @@ module.exports = async (rogue, config) => {
                 try {
                     data.forEach(d => createFolder(d.folder));
                 } catch (e) {
-                    return new RogueResponse({error: e}, 500).complete(res);
+                    return res({error: e});
                 }
 
                 let upload = multer({
@@ -171,7 +169,7 @@ module.exports = async (rogue, config) => {
 
                 upload(req, res, function (err) {
                     if (err) // err instanceof multer.MulterError
-                        return new RogueResponse({error: e}, 500).complete(res);
+                        return res.error({error: e});
 
                     return next();
                 });
