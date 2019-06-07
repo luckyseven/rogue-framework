@@ -1,6 +1,6 @@
 {
   "name": "rogue-framework",
-  "version": "1.0.38",
+  "version": "1.0.41",
   "description": "Rogue Framework - Power up your NodeJS applications with a reliable structure and shared services",
   "main": "index.js",
   "repository": "luckyseven/rogue-framework",
@@ -11,6 +11,7 @@
   "license": "MIT",
   "dependencies": {
     "bcrypt": "^2.0.1",
+    "bluebird": "^3.5.5",
     "body-parser": "^1.18.2",
     "chalk": "^2.3.0",
     "clear": "0.0.1",
