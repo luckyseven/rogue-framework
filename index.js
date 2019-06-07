@@ -104,6 +104,15 @@ module.exports = class Rogue {
     // }
 
     action(controller, action, data) {
+        const getControllerFromPath = controller => {
+            const parts = controller.split('/');
+            let result = this.controllers[parts[0]];
+            for (let i = 1, l = parts.length; i < l; i++) {
+                result = result[parts[i]];
+            }
+            return result;
+        };
+
         return (req, res, next) => {
             res.complete = (response, status) => {
                 if (!(response instanceof RogueResponse)) {
@@ -120,7 +129,11 @@ module.exports = class Rogue {
 
             req._data = typeof data !== "undefined" ? data : null;
 
-            return this.controllers[controller][action](req, res, next);
+            console.log("CTRL", controller);
+
+            const controllerObj = getControllerFromPath(controller);
+
+            return controllerObj[action](req, res, next);
         }
     }
 
