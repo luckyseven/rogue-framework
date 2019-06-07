@@ -1,5 +1,6 @@
 const mongoose   = require('mongoose');
 const requireAll = require('require-all');
+mongoose.Promise = require('bluebird');
 
 module.exports = (rogue, config) => {
 
@@ -7,7 +8,7 @@ module.exports = (rogue, config) => {
     rogue.models     = {};
 
     if (config.enabled) {
-        mongoose.connect('mongodb://' + config.host + '/' + config.db_name);
+        mongoose.connect('mongodb://' + config.host + '/' + config.db_name, { useMongoClient: true });
     }
 
     const models = requireAll({
