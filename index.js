@@ -140,7 +140,12 @@ module.exports = class Rogue {
     }
 
     loadConfFromEnv() {
-        this.config = require(this.getRootDir() + '/config/config.js');
+        try {
+            this.config = require(this.getRootDir() + '/config/config.js');
+        } catch (e) {
+            console.error('Required file /config/config.js not found.');
+            process.exit();
+        }
 
         if (typeof process.env.NODE_ENV !== 'undefined') {
             try {
