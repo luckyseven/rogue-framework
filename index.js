@@ -57,6 +57,7 @@ module.exports = class Rogue {
             dirname : controllersPath,
             resolve : controller => controller(this)
         });
+
     }
 
     loadModules() {
@@ -72,6 +73,15 @@ module.exports = class Rogue {
         }
     }
 
+    _getObjectFromPath(path, objectsArray) {
+        const parts = path.split('/');
+        let result = objectsArray[parts[0]];
+        for (let i = 1, l = parts.length; i < l; i++) {
+            result = result[parts[i]];
+        }
+        return result;
+    }
+
     loadRoutes() {
         const routesPath = path.join(this.getRootDir(), '/routes');
         if (!fs.existsSync(routesPath))
@@ -79,12 +89,18 @@ module.exports = class Rogue {
         const routes = requireAll({
             dirname     :  routesPath
         });
+
         for (let route in this.config.routes) {
             if (!Array.isArray(this.config.routes[route])) {
                 this.config.routes[route] = [this.config.routes[route]];
             }
             this.config.routes[route].forEach((router) => {
-                this.expressApp.use(route, routes[router](this));
+                let routerObj = this._getObjectFromPath(router, routes);
+                try {
+                    this.expressApp.use(route, routerObj(this));
+                } catch (e) {
+                    console.error('Router ' + router + ' doesn\'t exists and will not be loaded.');
+                }
             });
         }
     }
@@ -104,15 +120,6 @@ module.exports = class Rogue {
     // }
 
     action(controller, action, data) {
-        const getControllerFromPath = controller => {
-            const parts = controller.split('/');
-            let result = this.controllers[parts[0]];
-            for (let i = 1, l = parts.length; i < l; i++) {
-                result = result[parts[i]];
-            }
-            return result;
-        };
-
         return (req, res, next) => {
             res.complete = (response, status) => {
                 if (!(response instanceof RogueResponse)) {
@@ -129,9 +136,7 @@ module.exports = class Rogue {
 
             req._data = typeof data !== "undefined" ? data : null;
 
-            console.log("CTRL", controller);
-
-            const controllerObj = getControllerFromPath(controller);
+            const controllerObj = this._getObjectFromPath(controller, this.controllers);
 
             return controllerObj[action](req, res, next);
         }
