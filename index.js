@@ -9,7 +9,11 @@ const RogueError        = require('./core/http/RogueError');
 
 module.exports = class Rogue {
     constructor(config) {
-        this.config     = config;
+        if (!config) {
+            this.loadConfFromEnv();
+        } else {
+            this.config = config;
+        }
         this.express    = express;
         this.expressApp = express();
 
@@ -133,5 +137,33 @@ module.exports = class Rogue {
 
     listen(port, callback) {
         return this.expressApp.listen.apply(this.expressApp, arguments);
+    }
+
+    loadConfFromEnv() {
+        this.config = require(this.getRootDir() + '/config/config.js');
+
+        if (typeof process.env.NODE_ENV !== 'undefined') {
+            try {
+                const env = require(this.getRootDir() + '/config/config.' + process.env.NODE_ENV + '.js');
+
+                const configUpdater = (conf, env) => {
+                    for (let key of Object.keys(env)) {
+
+                        if (typeof conf[key] === 'undefined' || (typeof conf[key] !== 'object' || Array.isArray(conf[key]))) {
+                            conf[key] = env[key];
+                            continue;
+                        }
+
+                        configUpdater(conf[key], env[key]);
+                    }
+                };
+
+                configUpdater(this.config, env);
+            } catch (e) {
+                console.warn('File config.' + process.env.NODE_ENV + '.js not found. Using config.js as default.');
+            }
+
+
+        }
     }
 };
