@@ -115,7 +115,7 @@ module.exports = class Rogue {
         });
 
         for (let route in this.config.routes) {
-            this.expressApp.use(this.config.routes[route], routes[route](this));
+            this.expressApp.use(route, routes[this.config.routes[route]](this));
             if (!Array.isArray(this.config.routes[route])) {
                 this.config.routes[route] = [this.config.routes[route]];
             }
@@ -151,16 +151,18 @@ module.exports = class Rogue {
     }
 
     getPolicies(controller, action) {
-        if (!this.config.modules.policies.enabled)
-            return [];
+        if (this.config.modules && this.config.modules.policies) {
+            if (!this.config.modules.policies.enabled)
+                return [];
 
-        if (typeof this.policies[controller] === 'undefined')
-            return [];
+            if (typeof this.policies[controller] === 'undefined')
+                return [];
 
-        if (typeof this.policies[controller][action] === 'undefined')
-            return [];
+            if (typeof this.policies[controller][action] === 'undefined')
+                return [];
 
-        return this.policies[controller][action];
+            return this.policies[controller][action];
+        }
     }
 
     action(controller, action, data) {
