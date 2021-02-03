@@ -8,12 +8,13 @@ const RogueResponse     = require('./core/http/RogueResponse');
 const RogueError        = require('./core/http/RogueError');
 
 module.exports = class Rogue {
-    constructor(config) {
+    constructor(config = null) {
         if (!config) {
             this.loadConfFromEnv();
         } else {
             this.config = config;
         }
+      
         this.express    = express;
         this.expressApp = express();
 
@@ -47,6 +48,29 @@ module.exports = class Rogue {
         this.loadModules();
         this.loadControllers();
         this.loadRoutes();
+        this.loadPolicies();
+    }
+
+    loadConfFromEnv() {
+        this.config = require(this.getRootDir() + '/config/config.js');
+
+        if (typeof process.env.NODE_ENV !== 'undefined') {
+            const env = require(this.getRootDir() + '/config/config.' + process.env.NODE_ENV + '.js');
+
+            const recursiveFunc = (conf, env) => {
+                for (let key of Object.keys(env)) {
+
+                    if (typeof conf[key] === 'undefined' || typeof conf[key] !== 'object') {
+                        conf[key] = env[key];
+                        continue;
+                    }
+
+                    recursiveFunc(conf[key], env[key]);
+                }
+            };
+
+            recursiveFunc(this.config, env);
+        }
     }
 
     loadControllers() {
@@ -91,6 +115,7 @@ module.exports = class Rogue {
         });
 
         for (let route in this.config.routes) {
+            this.expressApp.use(this.config.routes[route], routes[route](this));
             if (!Array.isArray(this.config.routes[route])) {
                 this.config.routes[route] = [this.config.routes[route]];
             }
@@ -115,11 +140,31 @@ module.exports = class Rogue {
         });
     }
 
-    // action(controller, action) {
-    //     return this.controllers[controller][action];
-    // }
+    loadPolicies() {
+        const policiesPath = path.join(this.getRootDir(), '/policies');
+        if (!fs.existsSync(policiesPath))
+            throw new Error("Directory 'policies' doesn't exists in the project root.");
+        this.policies = requireAll({
+            dirname : policiesPath,
+            resolve : policy => policy(this)
+        });
+    }
+
+    getPolicies(controller, action) {
+        if (!this.config.modules.policies.enabled)
+            return [];
+
+        if (typeof this.policies[controller] === 'undefined')
+            return [];
+
+        if (typeof this.policies[controller][action] === 'undefined')
+            return [];
+
+        return this.policies[controller][action];
+    }
 
     action(controller, action, data) {
+
         return (req, res, next) => {
             res.complete = (response, status) => {
                 if (!(response instanceof RogueResponse)) {
@@ -134,11 +179,16 @@ module.exports = class Rogue {
                 error.complete(res);
             };
 
-            req._data = typeof data !== "undefined" ? data : null;
+            req.data = typeof data !== "undefined" ? data : null;
+
+            return this.express.Router({mergeParams: true}).use(
+                [...this.getPolicies(controller, action), this.controllers[controller][action]]
+            )(req, res, next);
 
             const controllerObj = this._getObjectFromPath(controller, this.controllers);
 
             return controllerObj[action](req, res, next);
+
         }
     }
 
