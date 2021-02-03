@@ -9,13 +9,12 @@ const RogueError        = require('./core/http/RogueError');
 
 module.exports = class Rogue {
     constructor(config = null) {
-
         if (!config) {
             this.loadConfFromEnv();
         } else {
             this.config = config;
         }
-
+      
         this.express    = express;
         this.expressApp = express();
 
@@ -82,6 +81,7 @@ module.exports = class Rogue {
             dirname : controllersPath,
             resolve : controller => controller(this)
         });
+
     }
 
     loadModules() {
@@ -97,6 +97,15 @@ module.exports = class Rogue {
         }
     }
 
+    _getObjectFromPath(path, objectsArray) {
+        const parts = path.split('/');
+        let result = objectsArray[parts[0]];
+        for (let i = 1, l = parts.length; i < l; i++) {
+            result = result[parts[i]];
+        }
+        return result;
+    }
+
     loadRoutes() {
         const routesPath = path.join(this.getRootDir(), '/routes');
         if (!fs.existsSync(routesPath))
@@ -104,8 +113,20 @@ module.exports = class Rogue {
         const routes = requireAll({
             dirname     :  routesPath
         });
+
         for (let route in this.config.routes) {
             this.expressApp.use(this.config.routes[route], routes[route](this));
+            if (!Array.isArray(this.config.routes[route])) {
+                this.config.routes[route] = [this.config.routes[route]];
+            }
+            this.config.routes[route].forEach((router) => {
+                let routerObj = this._getObjectFromPath(router, routes);
+                try {
+                    this.expressApp.use(route, routerObj(this));
+                } catch (e) {
+                    console.error('Router ' + router + ' doesn\'t exists and will not be loaded.');
+                }
+            });
         }
     }
 
@@ -163,6 +184,11 @@ module.exports = class Rogue {
             return this.express.Router({mergeParams: true}).use(
                 [...this.getPolicies(controller, action), this.controllers[controller][action]]
             )(req, res, next);
+
+            const controllerObj = this._getObjectFromPath(controller, this.controllers);
+
+            return controllerObj[action](req, res, next);
+
         }
     }
 
@@ -179,5 +205,38 @@ module.exports = class Rogue {
 
     listen(port, callback) {
         return this.expressApp.listen.apply(this.expressApp, arguments);
+    }
+
+    loadConfFromEnv() {
+        try {
+            this.config = require(this.getRootDir() + '/config/config.js');
+        } catch (e) {
+            console.error('Required file /config/config.js not found.');
+            process.exit();
+        }
+
+        if (typeof process.env.NODE_ENV !== 'undefined') {
+            try {
+                const env = require(this.getRootDir() + '/config/config.' + process.env.NODE_ENV + '.js');
+
+                const configUpdater = (conf, env) => {
+                    for (let key of Object.keys(env)) {
+
+                        if (typeof conf[key] === 'undefined' || (typeof conf[key] !== 'object' || Array.isArray(conf[key]))) {
+                            conf[key] = env[key];
+                            continue;
+                        }
+
+                        configUpdater(conf[key], env[key]);
+                    }
+                };
+
+                configUpdater(this.config, env);
+            } catch (e) {
+                console.warn('File config.' + process.env.NODE_ENV + '.js not found. Using config.js as default.');
+            }
+
+
+        }
     }
 };
