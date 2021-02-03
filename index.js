@@ -163,6 +163,7 @@ module.exports = class Rogue {
 
             return this.policies[controller][action];
         }
+        return [];
     }
 
     action(controller, action, data) {
