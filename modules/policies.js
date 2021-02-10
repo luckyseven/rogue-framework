@@ -157,7 +157,7 @@ module.exports = async (rogue, config) => {
                 try {
                     data.forEach(d => createFolder(d.folder));
                 } catch (e) {
-                    return res({error: e});
+                    return res.error({error: e});
                 }
 
                 let upload = multer({
@@ -179,7 +179,7 @@ module.exports = async (rogue, config) => {
             required   : (obj, fields)                     => required({obj, fields}),
             allowed    : (obj, fields)                     => allowed({obj, fields}),
             castFields : (obj, fields, cast)               => castFields({obj, fields, cast}),
-            custom     : (obj, fields, func, status = 500) => custom({obj, fields, func, status}),
+            custom     : (obj, fields, func, status = 412) => custom({obj, fields, func, status}),
             uploadFile : (obj)                             => uploadFile(obj),
         };
 
