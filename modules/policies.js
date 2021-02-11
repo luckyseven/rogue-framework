@@ -90,12 +90,13 @@ module.exports = async (rogue, config) => {
             (req, res, next) => {
                 const missingField = loopReq(req[data.obj], data.fields);
 
-                return !missingField ? next() : res.error({error: `field '${missingField}' is mandatory`}, 422)
+                if (missingField) {
+                    throw res.error({error: `field '${missingField}' is mandatory`}, 422)
+                }
             };
         const allowed = data =>
             (req, res, next) => {
                 req[data.obj] = checkAllowed(req[data.obj], data.fields);
-                next()
             };
         const castFields = data =>
             (req, res, next) => {
@@ -113,9 +114,10 @@ module.exports = async (rogue, config) => {
                                     req[obj][field] = new Date(req[obj][field]);
                                     break;
                                 case 'Number':
-                                    req[obj][field] = Number(req[obj][field]);
-                                    if (String(req[obj][field]) === 'NaN')
+                                    if (isNaN(req[obj][field])) {
                                         throw `illegal conversion of '${field}' to number`;
+                                    }
+                                    req[obj][field] = Number(req[obj][field]);
                                     break;
                                 default:
                                     req[obj][field] = data.cast(req[obj][field]);
@@ -123,11 +125,9 @@ module.exports = async (rogue, config) => {
                             }
                         }
                     });
-
-                    return next();
                 }
                 catch (e) {
-                    return res.error({error: e.toString()}, 400);
+                    throw res.error({error: e.toString()}, 400);
                 }
             };
         const custom = data =>
@@ -137,27 +137,26 @@ module.exports = async (rogue, config) => {
 
                     data.fields.forEach(field => {
                         if (typeof req[obj][field] !== 'undefined') {
-                            if (!data.func(req[obj][field]))
+                            if (!data.func(req[obj][field])) {
                                 throw `field '${field}' has not a valid value`;
+                            }
                         }
                     });
-
-                    return next();
                 }
                 catch (e) {
-                    return res.error({error: e.toString()}, data.status);
+                    throw res.error({error: e.toString()}, data.status);
                 }
             };
         const uploadFile = data =>
             (req, res, next) => {
 
-                if (!Array.isArray(data))
+                if (!Array.isArray(data)) {
                     data = [data];
-
+                }
                 try {
                     data.forEach(d => createFolder(d.folder));
                 } catch (e) {
-                    return res.error({error: e});
+                    throw res.error({error: e});
                 }
 
                 let upload = multer({
@@ -168,10 +167,10 @@ module.exports = async (rogue, config) => {
                 upload = upload.fields(data.map(d => { return { name: d.name, maxCount: d.count } }));
 
                 upload(req, res, function (err) {
-                    if (err) // err instanceof multer.MulterError
-                        return res.error({error: e});
-
-                    return next();
+                    // err instanceof multer.MulterError
+                    if (err) {
+                        throw res.error({error: e});
+                    }
                 });
             };
 
@@ -179,7 +178,7 @@ module.exports = async (rogue, config) => {
             required   : (obj, fields)                     => required({obj, fields}),
             allowed    : (obj, fields)                     => allowed({obj, fields}),
             castFields : (obj, fields, cast)               => castFields({obj, fields, cast}),
-            custom     : (obj, fields, func, status = 412) => custom({obj, fields, func, status}),
+            custom     : (obj, fields, func, status= 412) => custom({obj, fields, func, status}),
             uploadFile : (obj)                             => uploadFile(obj),
         };
 

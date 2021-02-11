@@ -167,7 +167,6 @@ module.exports = class Rogue {
     }
 
     action(controller, action, data) {
-
         return (req, res, next) => {
             res.complete = (response, status) => {
                 if (!(response instanceof RogueResponse)) {
@@ -184,14 +183,18 @@ module.exports = class Rogue {
 
             req.data = typeof data !== "undefined" ? data : null;
 
-            return this.express.Router({mergeParams: true}).use(
-                [...this.getPolicies(controller, action), this.controllers[controller][action]]
-            )(req, res, next);
-
             const controllerObj = this._getObjectFromPath(controller, this.controllers);
 
-            return controllerObj[action](req, res, next);
+            try {
+                const all = this.getPolicies(controller, action)
+                for (const policy of all) {
+                    policy(req, res, next);
+                }
+            } catch(resError) {
+                return resError;
+            }
 
+            return controllerObj[action](req, res, next);
         }
     }
 
